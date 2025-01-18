@@ -2,11 +2,18 @@ import React, {useState} from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image, Animated,TouchableWithoutFeedback } from "react-native";
 import MenubarComponent from "../../components/MenubarComponentAdmin";
 import NavigationPaneAdmin from "../../components/NavigationPaneAdmin";
+import { useRouter } from "expo-router";
 
 
 export default function MaterialsScreen() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const slideAnim = useState(new Animated.Value(-250))[0]; // Initial position of the navigation pane
+  const router = useRouter();
+
+  const handlePress = (route) => {
+    router.push(route);
+  };
+
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -50,7 +57,7 @@ export default function MaterialsScreen() {
 
         {/* Buttons */}
         <View style={styles.buttonContainer}>
-          <CustomButton title="Add Materials" />
+          <CustomButton title="Add Materials" onPress={() => handlePress('/AddMaterial')}/>
           <CustomButton title="View Materials" />
           <CustomButton title="Update Materials" />
           <CustomButton title="Delete Materials" />
@@ -64,8 +71,8 @@ export default function MaterialsScreen() {
   );
 }
 
-const CustomButton = ({ title }) => (
-  <TouchableOpacity style={styles.button}>
+const CustomButton = ({ title, onPress }) => (
+  <TouchableOpacity style={styles.button} onPress={onPress}>
     <Text style={styles.buttonText}>{title}</Text>
   </TouchableOpacity>
 );
