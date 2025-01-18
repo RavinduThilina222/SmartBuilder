@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Animated, TouchableWithoutFeedback, Image, Modal, FlatList } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { addDoc, collection } from 'firebase/firestore';
+import { db, storage } from './../../firebase.config.js';
 import MenubarComponent from '../../components/MenubarComponentAdmin';
 import NavigationPaneAdmin from '../../components/NavigationPaneAdmin';
 
@@ -26,9 +29,33 @@ export default function AddMaterial() {
     }
   };
 
-  const handleAddMaterial = () => {
-    // Add material submission logic
-    alert(`Material Added: ${materialName}`);
+  const handleAddMaterial = async () => {
+    if (!materialType || !materialName || !materialPrice || !image) {
+      alert('Please fill all the fields and upload an image.');
+      return;
+    }
+  
+    try {
+      // Upload image to Firebase Storage
+      const response = await fetch(image);
+      const blob = await response.blob();
+      const storageRef = ref(storage, `/materials/${Date.now()}_${materialName}`);
+      await uploadBytes(storageRef, blob);
+      const imageUrl = await getDownloadURL(storageRef);
+  
+      // Add material data to Firestore
+      await addDoc(collection(db, 'materials'), {
+        materialType,
+        materialName,
+        materialPrice,
+        imageUrl,
+      });
+  
+      alert('Material added successfully!');
+    } catch (error) {
+      console.error('Error adding material: ', error);
+      alert('Error adding material. Please try again.');
+    }
   };
 
   const toggleMenu = () => {
@@ -216,7 +243,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
+    marginBottom: 20,
   },
   input: {
     flex: 1,
