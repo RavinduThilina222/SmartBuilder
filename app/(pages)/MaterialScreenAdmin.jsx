@@ -1,14 +1,15 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import MenubarComponent from "./../../components/MenubarComponent";
 
 
 export default function MaterialsScreen() {
   return (
-    <ImageBackground
-      source={require('./../../assets/images/material_home.jpg')} // Replace with your background image URL or require('./path/to/image.jpg')
-      style={styles.backgroundImage}
-    >
+    <View style={styles.main}>
+      <Image
+        source={require('./../../assets/images/material_home.jpg')}
+        style={styles.backgroundImage}
+      />
       <View style={styles.container}>
         {/* Header */}
         <MenubarComponent />
@@ -27,7 +28,7 @@ export default function MaterialsScreen() {
         {/* Footer */}
         <Text style={styles.footer}>©2024 SMARTBUILDER</Text>
       </View>
-    </ImageBackground>
+    </View>
   );
 }
 
@@ -38,10 +39,25 @@ const CustomButton = ({ title }) => (
 );
 
 const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    opacity: 1, // Optional: to make the background image semi-transparent
+  },
   backgroundImage: {
     flex: 1,
     resizeMode: "cover",
-    justifyContent: "flex-end",
+    justifyContent: "center",
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    opacity: 0.6, // Optional: to make the background image semi-transparent
   },
   container: {
     flex: 1,
