@@ -2,11 +2,11 @@ import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const Menubar = () => {
+const Menubar = ({ onMenuPress }) => {
   return (
     <View style={styles.container}>
       {/* Hamburger Menu Icon */}
-      <TouchableOpacity>
+      <TouchableOpacity onPress={onMenuPress}>
         <Ionicons name="menu" size={30} color="#fff" style={styles.icon} />
       </TouchableOpacity>
 
@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#009688", // Teal color
     padding: 15,
     paddingHorizontal: 15,
-    borderBottomEndRadius:10,
-    margin:0
+    borderBottomEndRadius: 10,
+    margin: 0,
   },
   logoContainer: {
     flexDirection: "row",

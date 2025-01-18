@@ -1,18 +1,49 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import MenubarComponent from "./../../components/MenubarComponent";
+import React, {useState} from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image, Animated,TouchableWithoutFeedback } from "react-native";
+import MenubarComponent from "../../components/MenubarComponentAdmin";
+import NavigationPaneAdmin from "../../components/NavigationPaneAdmin";
 
 
 export default function MaterialsScreen() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const slideAnim = useState(new Animated.Value(-250))[0]; // Initial position of the navigation pane
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    Animated.timing(slideAnim, {
+      toValue: isMenuOpen ? -250 : 0, // Slide in or out
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeMenu = () => {
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+      Animated.timing(slideAnim, {
+        toValue: -250,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
+  const handleScreenTap = () => {
+    closeMenu();
+  };
+
   return (
+    <TouchableWithoutFeedback onPress={handleScreenTap}>
     <View style={styles.main}>
       <Image
         source={require('./../../assets/images/material_home.jpg')}
         style={styles.backgroundImage}
       />
       <View style={styles.container}>
-        {/* Header */}
-        <MenubarComponent />
+      <MenubarComponent onMenuPress={toggleMenu} />
+      <Animated.View style={[styles.navigationPane, { transform: [{ translateX: slideAnim }] }]}>
+        <NavigationPaneAdmin />
+      </Animated.View>
 
         {/* Title */}
         <Text style={styles.title}>Materials</Text>
@@ -29,6 +60,7 @@ export default function MaterialsScreen() {
         <Text style={styles.footer}>©2024 SMARTBUILDER</Text>
       </View>
     </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -41,12 +73,14 @@ const CustomButton = ({ title }) => (
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    width: '100%',
-    height: '100%',
+  },
+  navigationPane: {
     position: 'absolute',
     top: 0,
+    bottom: 0,
     left: 0,
-    opacity: 1, // Optional: to make the background image semi-transparent
+    width: 250,
+    zIndex: 1,
   },
   backgroundImage: {
     flex: 1,
