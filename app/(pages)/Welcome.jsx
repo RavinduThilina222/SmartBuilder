@@ -1,28 +1,32 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
 
 const logo = require("../../assets/images/smartbuilder_logo.png");
 
-export class Welcome extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Image source={logo} style={styles.logo} />
-        
-        <Text style={styles.title}>Welcome to SmartBuilder</Text>
-        <Text style={styles.subtitle}>The ultimate tool for building</Text>
+const Welcome = () => {
+  const navigation = useNavigation();
 
-        <TouchableOpacity 
-          style={styles.button}
-          onPress={() => this.props.navigation.navigate('Login')}>
-          <Text style={styles.buttonText}>Get Started</Text>
-        </TouchableOpacity>
-        {/* Footer */}
-        <Text style={styles.footerText}>Copyright ©2024 SMARTBUILDER</Text>
-      </View>
-    );
-  }
-}
+  return (
+    <View style={styles.container}>
+      <Image source={logo} style={styles.logo} />
+      
+      <Text style={styles.title}>Welcome to SmartBuilder</Text>
+      <Text style={styles.subtitle}>The ultimate tool for building</Text>
+
+      <TouchableOpacity 
+        style={styles.button}
+        onPress={() => navigation.navigate('Login')}>
+        <Text style={styles.buttonText}>Get Started</Text>
+      </TouchableOpacity>
+      {/* Footer */}
+      <Text style={styles.footerText}>Copyright ©2024 SMARTBUILDER</Text>
+    </View>
+  );
+};
+
+export default Welcome;
 
 const styles = StyleSheet.create({
     container: {
@@ -72,4 +76,3 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Welcome;

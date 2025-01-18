@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Welcome from './(pages)/Welcome';
 import Login from './(pages)/Login';
 import Signup from './(pages)/signup';
+import MaterialScreenAdmin from './(pages)/MaterialScreenAdmin';
 
 const Stack = createStackNavigator();
 
@@ -12,6 +13,7 @@ export default function Index() {
       <Stack.Screen name="Welcome" component={Welcome} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name='signup' component={Signup} />
+      <Stack.Screen name='MaterialScreenAdmin' component={MaterialScreenAdmin} />
     </Stack.Navigator>
   );
 }
