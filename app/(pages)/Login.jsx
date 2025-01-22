@@ -73,7 +73,7 @@ const Login = ({ navigation }) => {
       {/* Login Button */}
       <TouchableOpacity
         style={styles.loginButton}
-        onPress={() => navigation.navigate("Home")}
+        onPress={() => navigation.navigate("MaterialScreenAdmin")}
       >
         <Feather name="log-in" size={20} color="white" style={styles.loginIcon} />
         <Text style={styles.loginText}>LOGIN</Text>

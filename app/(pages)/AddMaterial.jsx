@@ -36,9 +36,14 @@ export default function AddMaterial() {
     }
   
     try {
-      // Upload image to Firebase Storage
+      // Fetch the image and convert it to a blob
       const response = await fetch(image);
+      if (!response.ok) {
+        throw new Error('Failed to fetch image');
+      }
       const blob = await response.blob();
+  
+      // Upload image to Firebase Storage
       const storageRef = ref(storage, `/materials/${Date.now()}_${materialName}`);
       await uploadBytes(storageRef, blob);
       const imageUrl = await getDownloadURL(storageRef);
@@ -52,10 +57,10 @@ export default function AddMaterial() {
       });
   
       alert('Material added successfully!');
-    } catch (error) {
-      console.error('Error adding material: ', error);
-      alert('Error adding material. Please try again.');
-    }
+  } catch (error) {
+    console.error('Error adding material: ', error);
+    alert(`Error adding material: ${error.message}`);
+  }
   };
 
   const toggleMenu = () => {
