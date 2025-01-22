@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Picker } from 'react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const UserProfilePage = () => {
   const [gender, setGender] = useState('');
@@ -10,7 +11,7 @@ const UserProfilePage = () => {
         <Text style={styles.headerText}>SMARTBUILDER</Text>
       </View>
       <View style={styles.profilePictureContainer}>
-        <Image style={styles.profilePicture} source={require('./../../assets/images/profile-placeholder.jpg')} />
+        <Image style={styles.profilePicture} source={<FontAwesome name="user-circle-o" size={24} color="black" />} />
         <TouchableOpacity>
           <Text style={styles.uploadText}>Upload a Profile Picture</Text>
         </TouchableOpacity>
