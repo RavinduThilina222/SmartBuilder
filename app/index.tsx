@@ -11,7 +11,11 @@ import HireLabor from './(pages)/HireLabor';
 import Addlabor from './(pages)/AddLabor';
 import UpdateLabor from './(pages)/UpdateLabor';
 import DeleteLabor from './(pages)/DeleteLabor';
-import LaborDetail from './(pages)/LaborDetail';  
+import LaborDetail from './(pages)/LaborDetail';
+import ProjectListPage from './(pages)/ProjectListPage';
+import ProjectPage from './(pages)/ProjectPage'; 
+import ProjectDetailsPage from './(pages)/ProjectDetailsPage';
+import EstimatePage from './(pages)/EstimatePage';
 
 
 const Stack = createStackNavigator();
@@ -31,6 +35,10 @@ export default function Index() {
       <Stack.Screen name='UpdateLabor' component={UpdateLabor} />
       <Stack.Screen name='DeleteLabor' component={DeleteLabor} />
       <Stack.Screen name='LaborDetail' component={LaborDetail} />
+      <Stack.Screen name='ProjectListPage' component={ProjectListPage} />
+      <Stack.Screen name='ProjectPage' component={ProjectPage} />
+      <Stack.Screen name='ProjectDetailsPage' component={ProjectDetailsPage} />
+      <Stack.Screen name='EstimatePage' component={EstimatePage} />
     </Stack.Navigator>
   );
 }
