@@ -10,14 +10,18 @@ import AdminLabor from './(pages)/AdminLabor';
 import HireLabor from './(pages)/HireLabor';
 import Addlabor from './(pages)/AddLabor';
 import UpdateLabor from './(pages)/UpdateLabor';
-import DeleteLabor from './(pages)/DeleteLabor';
-import LaborDetail from './(pages)/LaborDetail';  
+import DeleteLabor from './(pages)/DeleteLabor'; 
 import Supplier from './(pages)/Supplier';
 import SupplierDetails from './(pages)/SupplierDetails';
 import SupplierList from './(pages)/SupplierList';
 import ViewMaterial from './(pages)/ViewMaterial';
 import DeleteMaterial from './(pages)/DeleteMaterial';
 import UpdateMaterial from './(pages)/UpdateMaterial';
+import LaborDetail from './(pages)/LaborDetail';
+import ProjectListPage from './(pages)/ProjectListPage';
+import ProjectPage from './(pages)/ProjectPage'; 
+import ProjectDetailsPage from './(pages)/ProjectDetailsPage';
+import EstimatePage from './(pages)/EstimatePage';
 
 
 const Stack = createStackNavigator();
@@ -43,6 +47,10 @@ export default function Index() {
       <Stack.Screen name='ViewMaterial' component={ViewMaterial} />
       <Stack.Screen name='DeleteMaterial' component={DeleteMaterial} />
       <Stack.Screen name='UpdateMaterial' component={UpdateMaterial} />
+      <Stack.Screen name='ProjectListPage' component={ProjectListPage} />
+      <Stack.Screen name='ProjectPage' component={ProjectPage} />
+      <Stack.Screen name='ProjectDetailsPage' component={ProjectDetailsPage} />
+      <Stack.Screen name='EstimatePage' component={EstimatePage} />
     </Stack.Navigator>
   );
 }
