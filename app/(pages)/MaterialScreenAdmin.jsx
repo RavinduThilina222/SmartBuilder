@@ -58,7 +58,7 @@ export default function MaterialsScreen() {
         {/* Buttons */}
         <View style={styles.buttonContainer}>
           <CustomButton title="Add Materials" onPress={() => handlePress('/AddMaterial')}/>
-          <CustomButton title="View Materials" />
+          <CustomButton title="View Materials" onPress={() => handlePress('/ViewMaterial')}/>
           <CustomButton title="Update Materials" />
           <CustomButton title="Delete Materials" />
         </View>

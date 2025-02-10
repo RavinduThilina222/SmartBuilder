@@ -14,7 +14,7 @@ export default function SupplierPage() {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../../assets/images/local-hardware-3.png")}
+        source={require("../../assets/images/material_home.jpg")}
         style={styles.backgroundImage}
       >
         {/* Dark Overlay */}

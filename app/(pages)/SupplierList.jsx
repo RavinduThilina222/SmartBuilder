@@ -29,7 +29,7 @@ const SupplierList = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground
-        source={require('../../assets/images/local-hardware-3.png')} // Local background image
+        source={require('../../assets/images/material_home.jpg')} // Local background image
         style={styles.background}
         imageStyle={styles.backgroundImage}
       >

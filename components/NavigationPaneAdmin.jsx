@@ -19,14 +19,8 @@ const NavigationPaneAdmin = () => {
 
       {/* Suppliers */}
       <TouchableOpacity style={styles.navItem}>
-        <FontAwesome5 name="truck" size={24} color="#fff" style={styles.icon} />
-        <Text style={styles.text}>Suppliers</Text>
-      </TouchableOpacity>
-
-      {/* Labors */}
-      <TouchableOpacity style={styles.navItem}>
-        <FontAwesome5 name="hard-hat" size={24} color="#fff" style={styles.icon} />
-        <Text style={styles.text}>Labors</Text>
+        <FontAwesome5 name="file" size={24} color="#fff" style={styles.icon} />
+        <Text style={styles.text}>Estimations</Text>
       </TouchableOpacity>
 
       {/* Spacer */}

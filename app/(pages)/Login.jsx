@@ -9,12 +9,19 @@ import {
 } from 'react-native';
 import { CheckBox } from 'react-native-elements'; // For checkbox
 import { FontAwesome, Feather } from '@expo/vector-icons'; // For icons
+import { useRouter } from 'expo-router';
 
 const logo = require("../../assets/images/smartbuilder_logo.png");
 
 const Login = ({ navigation }) => {
   const [rememberMe, setRememberMe] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const router = useRouter();
+
+  const handlePress = (route) => {
+    router.push(route);
+  }
 
   return (
     <View style={styles.container}>
@@ -73,7 +80,7 @@ const Login = ({ navigation }) => {
       {/* Login Button */}
       <TouchableOpacity
         style={styles.loginButton}
-        onPress={() => navigation.navigate("MaterialScreenAdmin")}
+        onPress={() => router.push('MaterialScreenAdmin')}
       >
         <Feather name="log-in" size={20} color="white" style={styles.loginIcon} />
         <Text style={styles.loginText}>LOGIN</Text>
@@ -81,10 +88,10 @@ const Login = ({ navigation }) => {
 
       {/* Sign Up Link to signup page */}
       <TouchableOpacity
-      onPress={() => navigation.navigate("signup")}>
+        onPress={() => router.push('signup')}
+      >
         <Text style={styles.signUpText}>Sign up here</Text>
       </TouchableOpacity>
-
       {/* Footer */}
       <Text style={styles.footerText}>Copyright ©2024 SMARTBUILDER</Text>
     </View>
