@@ -8,9 +8,13 @@ import {
   Image,
   Modal,
   FlatList,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native';
 import { FontAwesome, Feather } from '@expo/vector-icons'; // For icons
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from './../../firebase.config';
+import { router, useRouter } from 'expo-router';
 
 const logo = require("../../assets/images/smartbuilder_logo.png");
 
@@ -25,10 +29,29 @@ const SignUp = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleSignUp = () => {
-    // Handle sign up logic here
-    // After successful signup, navigate to Login page
-    navigation.navigate('Login');
+  const handleSignUp = async () => {
+    if (!firstName || !lastName || !email || !mobileNumber || !gender || !address || !password) {
+      Alert.alert('Validation Error', 'All fields are required.');
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "User"), {
+        First_Name: firstName,
+        Last_Name: lastName,
+        Email: email,
+        Mobile_Number: mobileNumber,
+        Gender: gender,
+        Address: address,
+        Password: password,
+        Role: 'User'
+      });
+      Alert.alert('Success', 'Account created successfully.');
+      router.push('Login');
+    } catch (error) {
+      console.log('Signup error:', error.message);
+      Alert.alert('Signup Error', error.message);
+    }
   };
 
   const genders = ['Male', 'Female', 'Other'];

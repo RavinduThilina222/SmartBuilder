@@ -1,7 +1,7 @@
 import React from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet,Animated, TouchableWithoutFeedback } from "react-native";
 import MenubarComponent from "../../components/MenubarComponentAdmin";
-
+import NavigationPaneAdmin from "../../components/NavigationPaneAdmin";
 const projects = [
   { id: "1", name: "Project_05", timeline: "2024/08/01 - 2025/01/25" },
   { id: "2", name: "Project_04", timeline: "2024/03/01 - 2024/12/01" },
@@ -11,9 +11,40 @@ const projects = [
 ];
 
 const ProjectListPage = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const slideAnim = useState(new Animated.Value(-250))[0]; // Initial position of the navigation pane
+  
+    const toggleMenu = () => {
+      setIsMenuOpen(!isMenuOpen);
+      Animated.timing(slideAnim, {
+        toValue: isMenuOpen ? -250 : 0, // Slide in or out
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    };
+  
+    const closeMenu = () => {
+      if (isMenuOpen) {
+        setIsMenuOpen(false);
+        Animated.timing(slideAnim, {
+          toValue: -250,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }
+    };
+  
+    const handleScreenTap = () => {
+      closeMenu();
+    };
+
   return (
-    <View style={styles.container}>
-      <MenubarComponent /> {/*Added Menubar Component */}
+    <TouchableWithoutFeedback onPress={handleScreenTap}>
+      <View style={styles.container}>
+      <MenubarComponent onMenuPress={toggleMenu} />
+        <Animated.View style={[styles.navigationPane, { transform: [{ translateX: slideAnim }] }]}>
+          <NavigationPaneAdmin />
+        </Animated.View>
       <View style={{ marginTop: 60, alignItems: 'flex-start' }}>
         <Text style={styles.header}>PROJECTS</Text>
       </View>
@@ -32,6 +63,8 @@ const ProjectListPage = () => {
       />
     <Text style={styles.footer}>Copyright ©2024 SMARTBUILDER</Text>
     </View>
+    </TouchableWithoutFeedback>
+    
   );
 };
 

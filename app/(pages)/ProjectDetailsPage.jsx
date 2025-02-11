@@ -1,11 +1,42 @@
-import React from 'react';
-import { ScrollView, Text, TextInput, View, Button, StyleSheet, Picker } from 'react-native';
+import React, {useState} from 'react';
+import { ScrollView, Text, TextInput, View, Button, StyleSheet, Picker,Animated, TouchableWithoutFeedback } from 'react-native';
 import MenubarComponent from "../../components/MenubarComponentAdmin";
+import NavigationPaneAdmin from "../../components/NavigationPaneAdmin";
 
 export default function App() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+      const slideAnim = useState(new Animated.Value(-250))[0]; // Initial position of the navigation pane
+    
+      const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+        Animated.timing(slideAnim, {
+          toValue: isMenuOpen ? -250 : 0, // Slide in or out
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      };
+    
+      const closeMenu = () => {
+        if (isMenuOpen) {
+          setIsMenuOpen(false);
+          Animated.timing(slideAnim, {
+            toValue: -250,
+            duration: 300,
+            useNativeDriver: true,
+          }).start();
+        }
+      };
+    
+      const handleScreenTap = () => {
+        closeMenu();
+      };
   return (
-    <View style={styles.container}>
-    <MenubarComponent /> {/*Added Menubar Component */}
+    <TouchableWithoutFeedback onPress={handleScreenTap}>
+      <View style={styles.container}>
+    <MenubarComponent onMenuPress={toggleMenu} />
+        <Animated.View style={[styles.navigationPane, { transform: [{ translateX: slideAnim }] }]}>
+          <NavigationPaneAdmin />
+    </Animated.View>
     <ScrollView style={{ marginTop: 60 }}>
       {/* Project Name */}
       <Text style={styles.sectionHeader}>Project_05</Text>
@@ -155,6 +186,8 @@ export default function App() {
     </View>
     <Text style={styles.footer}>Copyright ©2024 SMARTBUILDER</Text>
     </View>
+    </TouchableWithoutFeedback>
+    
   );
 }
 
@@ -215,6 +248,14 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 20,
     marginBottom: 20,
+  },
+  navigationPane: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 250,
+    zIndex: 1,
   },
   footer: { textAlign: "center", color: "#888", marginTop: 20, fontSize: 12 },
 });

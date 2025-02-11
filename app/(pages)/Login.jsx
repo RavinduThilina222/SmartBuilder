@@ -5,23 +5,60 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Image
+  Image,
+  Alert
 } from 'react-native';
 import { CheckBox } from 'react-native-elements'; // For checkbox
 import { FontAwesome, Feather } from '@expo/vector-icons'; // For icons
 import { useRouter } from 'expo-router';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from './../../firebase.config';
 
 const logo = require("../../assets/images/smartbuilder_logo.png");
 
 const Login = ({ navigation }) => {
   const [rememberMe, setRememberMe] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const router = useRouter();
 
-  const handlePress = (route) => {
-    router.push(route);
-  }
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  const handleLogin = async () => {
+    console.log('handleLogin called');
+    console.log('Email:', email);
+    console.log('Password:', password);
+
+    if (!email || !password) {
+      Alert.alert('Validation Error', 'Email and password are required.');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      Alert.alert('Validation Error', 'Please enter a valid email address.');
+      return;
+    }
+
+    try {
+      const q = query(collection(db, "User"), where("Email", "==", email), where("Password", "==", password));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        console.log('Login successful');
+        router.push('ProjectListPage');
+      } else {
+        Alert.alert('Login Error', 'Invalid email or password.');
+      }
+    } catch (error) {
+      console.log('Login error:', error.message);
+      Alert.alert('Login Error', error.message);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -31,13 +68,15 @@ const Login = ({ navigation }) => {
       {/* Title */}
       <Text style={styles.title}>Welcome To SMARTBUILDER</Text>
 
-      {/* Username Input */}
+      {/* Email Input */}
       <View style={styles.inputContainer}>
         <FontAwesome name="user" size={20} color="#3A9D9D" style={styles.icon} />
         <TextInput
-          placeholder="Username"
+          placeholder="Email"
           style={styles.input}
           placeholderTextColor="#777"
+          value={email}
+          onChangeText={setEmail}
         />
       </View>
 
@@ -49,6 +88,8 @@ const Login = ({ navigation }) => {
           secureTextEntry={!passwordVisible}
           style={styles.input}
           placeholderTextColor="#777"
+          value={password}
+          onChangeText={setPassword}
         />
         <TouchableOpacity
           onPress={() => setPasswordVisible(!passwordVisible)}
@@ -62,10 +103,7 @@ const Login = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Forgotten Account Link */}
-      <TouchableOpacity>
-        <Text style={styles.forgotText}>Forgotten Account?</Text>
-      </TouchableOpacity>
+      
 
       {/* Remember Me Checkbox */}
       <View style={styles.rememberMeContainer}>
@@ -80,7 +118,7 @@ const Login = ({ navigation }) => {
       {/* Login Button */}
       <TouchableOpacity
         style={styles.loginButton}
-        onPress={() => router.push('MaterialScreenAdmin')}
+        onPress={handleLogin}
       >
         <Feather name="log-in" size={20} color="white" style={styles.loginIcon} />
         <Text style={styles.loginText}>LOGIN</Text>
