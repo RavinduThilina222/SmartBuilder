@@ -1,72 +1,85 @@
-import React,{useState} from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet,Animated, TouchableWithoutFeedback } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated, TouchableWithoutFeedback } from "react-native";
 import MenubarComponent from "../../components/MenubarComponentAdmin";
 import NavigationPaneAdmin from "../../components/NavigationPaneAdmin";
-
-
-const projects = [
-  { id: "1", name: "Project_05", timeline: "2024/08/01 - 2025/01/25" },
-  { id: "2", name: "Project_04", timeline: "2024/03/01 - 2024/12/01" },
-  { id: "3", name: "Project_03", timeline: "2024/01/07 - 2025/01/10" },
-  { id: "4", name: "Project_02", timeline: "2023/11/04 - 2024/06/12" },
-  { id: "5", name: "Project_01", timeline: "2023/10/01 - 2024/11/25" },
-];
+import { db } from '../../firebase.config';
+import { collection, getDocs } from 'firebase/firestore';
+import { useRouter } from "expo-router";
 
 const ProjectListPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [projects, setProjects] = useState([]);
   const slideAnim = useState(new Animated.Value(-250))[0]; // Initial position of the navigation pane
-  
-    const toggleMenu = () => {
-      setIsMenuOpen(!isMenuOpen);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const projectsCol = collection(db, 'projects');
+      const projectsSnapshot = await getDocs(projectsCol);
+      const projectsList = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setProjects(projectsList);
+    };
+
+    fetchProjects();
+  }, []);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    Animated.timing(slideAnim, {
+      toValue: isMenuOpen ? -250 : 0, // Slide in or out
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeMenu = () => {
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
       Animated.timing(slideAnim, {
-        toValue: isMenuOpen ? -250 : 0, // Slide in or out
+        toValue: -250,
         duration: 300,
         useNativeDriver: true,
       }).start();
-    };
-  
-    const closeMenu = () => {
-      if (isMenuOpen) {
-        setIsMenuOpen(false);
-        Animated.timing(slideAnim, {
-          toValue: -250,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
-      }
-    };
-  
-    const handleScreenTap = () => {
-      closeMenu();
-    };
+    }
+  };
+
+  const handleScreenTap = () => {
+    closeMenu();
+  };
+
+  const handleProjectPress = (project) => {
+    router.push({
+      pathname: 'ProjectPage',
+      params: { document_id: project.id }
+    });
+  };
 
   return (
     <TouchableWithoutFeedback onPress={handleScreenTap}>
       <View style={styles.container}>
-      <MenubarComponent onMenuPress={toggleMenu} />
+        <MenubarComponent onMenuPress={toggleMenu} />
         <Animated.View style={[styles.navigationPane, { transform: [{ translateX: slideAnim }] }]}>
           <NavigationPaneAdmin />
         </Animated.View>
-      <View style={{ marginTop: 60, alignItems: 'flex-start' }}>
-        <Text style={styles.header}>PROJECTS</Text>
+        <View style={{ marginTop: 60, alignItems: 'flex-start' }}>
+          <Text style={styles.header}>PROJECTS</Text>
+        </View>
+        <TouchableOpacity style={styles.newProjectButton} onPress={() => router.push('AddProject')}>
+          <Text style={styles.buttonText}>+ New Project</Text>
+        </TouchableOpacity>
+        <FlatList
+          data={projects}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.projectItem} onPress={() => handleProjectPress(item)}>
+              <Text style={styles.projectName}>{item.title}</Text>
+              <Text style={styles.timeline}>{item.timeline}</Text>
+            </TouchableOpacity>
+          )}
+        />
+        <Text style={styles.footer}>Copyright ©2024 SMARTBUILDER</Text>
       </View>
-      <TouchableOpacity style={styles.newProjectButton}>
-        <Text style={styles.buttonText}>+ New Project</Text>
-      </TouchableOpacity>
-      <FlatList
-        data={projects}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.projectItem}>
-            <Text style={styles.projectName}>{item.name}</Text>
-            <Text style={styles.timeline}>{item.timeline}</Text>
-          </TouchableOpacity>
-        )}
-      />
-    <Text style={styles.footer}>Copyright ©2024 SMARTBUILDER</Text>
-    </View>
     </TouchableWithoutFeedback>
-    
   );
 };
 

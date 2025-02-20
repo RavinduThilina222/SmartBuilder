@@ -1,13 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Animated, TouchableWithoutFeedback, Image } from "react-native";
-import { launchImageLibrary } from 'react-native-image-picker';
+import { useRoute } from "@react-navigation/native";
+import { db } from '../../firebase.config';
+import { doc, getDoc } from 'firebase/firestore';
 import MenubarComponent from "../../components/MenubarComponentAdmin";
 import NavigationPaneAdmin from "../../components/NavigationPaneAdmin";
 
 const ProjectPage = () => {
+  const route = useRoute();
+  const { document_id } = route.params;
+  const [projectDetails, setProjectDetails] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
   const slideAnim = useState(new Animated.Value(-250))[0]; // Initial position of the navigation pane
+
+  useEffect(() => {
+    const fetchProjectDetails = async () => {
+      const projectDoc = doc(db, 'projects', document_id);
+      const projectSnapshot = await getDoc(projectDoc);
+      if (projectSnapshot.exists()) {
+        setProjectDetails(projectSnapshot.data());
+      } else {
+        console.log('No such document!');
+      }
+    };
+
+    fetchProjectDetails();
+  }, [document_id]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -33,45 +51,13 @@ const ProjectPage = () => {
     closeMenu();
   };
 
-  const handleAddPlanPress = () => {
-    launchImageLibrary({ mediaType: 'photo' }, async (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.errorCode) {
-        console.log('ImagePicker Error: ', response.errorMessage);
-      } else if (response.assets && response.assets.length > 0) {
-        const asset = response.assets[0];
-        console.log('Selected asset: ', asset);
-  
-        const data = new FormData();
-        data.append('file',asset.uri);
-        data.append('upload_preset', 'plan_upload'); 
-        data.append('cloud_name', 'dipz290mx');
-
-        console.log('FormData: ', data);
-
-  
-        try {
-          const res = await fetch('https://api.cloudinary.com/v1_1/dipz290mx/image/upload', {
-            method: 'POST',
-            body: data,
-          });
-          const result = await res.json();
-          if (result.error) {
-            console.error('Upload failed: ', result.error.message);
-          } else {
-            console.log('Upload success: ', result);
-            setUploadedImageUrl(result.secure_url); // Store the uploaded image URL
-          }
-                    
-        } catch (error) {
-          console.error('Upload failed:: ', error);
-        }
-      } else {
-        console.log('No assets found in response');
-      }
-    });
-  };
+  if (!projectDetails) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <TouchableWithoutFeedback onPress={handleScreenTap}>
@@ -81,23 +67,21 @@ const ProjectPage = () => {
           <NavigationPaneAdmin />
         </Animated.View>
         <View style={{ marginTop: 50, alignItems: 'flex-start' }}>
-          <Text style={styles.projectTitle}>Project_05</Text>
+          <Text style={styles.projectTitle}>{projectDetails.title}</Text>
         </View>
         <View style={styles.detailsCard}>
-          <Text style={styles.planNumber}>no plans found</Text>
-          {uploadedImageUrl && (
-            <Image source={{ uri: uploadedImageUrl }} style={styles.uploadedImage} />
+          {!projectDetails.planURL && <Text style={styles.planNumber}>no plans found</Text>}
+          {projectDetails.planURL && (
+            <Image source={{ uri: projectDetails.planURL }} style={styles.uploadedImage} />
           )}
         </View>
-        <TouchableOpacity style={styles.addPlanButton} onPress={handleAddPlanPress}>
-          <Text style={styles.buttonText}>+ Add Plan</Text>
-        </TouchableOpacity>
+        
         <View style={styles.timelineCard}>
-          <Text style={styles.timeline}>Timeline: 2024/08/01 - 2025/01/25</Text>
-          <Text style={styles.subTimeline}>Excavation: 2024/08/01 - 2024/08/01</Text>
-          <Text style={styles.subTimeline}>Foundation: 2024/08/08 - 2024/08/10</Text>
-          <Text style={styles.subTimeline}>Structure: 2024/11/15 - 2024/11/17</Text>
-          <Text style={styles.subTimeline}>Finishing: 2025/01/20 - 2025/01/25</Text>
+          <Text style={styles.timeline}>Timeline: {projectDetails.timeline}</Text>
+          <Text style={styles.subTimeline}>Excavation: {projectDetails.subTimelines.excavation}</Text>
+          <Text style={styles.subTimeline}>Foundation: {projectDetails.subTimelines.foundation}</Text>
+          <Text style={styles.subTimeline}>Structure: {projectDetails.subTimelines.structure}</Text>
+          <Text style={styles.subTimeline}>Finishing: {projectDetails.subTimelines.finishing}</Text>
         </View>
         <TouchableOpacity style={styles.moreDetailsButton}>
           <Text style={styles.buttonText}>More Details</Text>
