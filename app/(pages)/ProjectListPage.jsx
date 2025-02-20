@@ -1,7 +1,9 @@
-import React from "react";
+import React,{useState} from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet,Animated, TouchableWithoutFeedback } from "react-native";
 import MenubarComponent from "../../components/MenubarComponentAdmin";
 import NavigationPaneAdmin from "../../components/NavigationPaneAdmin";
+
+
 const projects = [
   { id: "1", name: "Project_05", timeline: "2024/08/01 - 2025/01/25" },
   { id: "2", name: "Project_04", timeline: "2024/03/01 - 2024/12/01" },
@@ -11,8 +13,8 @@ const projects = [
 ];
 
 const ProjectListPage = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const slideAnim = useState(new Animated.Value(-250))[0]; // Initial position of the navigation pane
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const slideAnim = useState(new Animated.Value(-250))[0]; // Initial position of the navigation pane
   
     const toggleMenu = () => {
       setIsMenuOpen(!isMenuOpen);
@@ -77,6 +79,14 @@ const styles = StyleSheet.create({
   projectName: { fontSize: 16, color: "#fff", fontWeight: "bold" },
   timeline: { color: "#ddd" },
   footer: { textAlign: "center", color: "#888", marginTop: 20, fontSize: 12 },
+  navigationPane: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 250,
+    zIndex: 1,
+  },
 });
 
 export default ProjectListPage;
