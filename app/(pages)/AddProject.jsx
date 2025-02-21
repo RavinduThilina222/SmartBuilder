@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Animated, TouchableWithoutFeedback, Image ,TextInput} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Animated, TouchableWithoutFeedback, Image, TextInput, ScrollView } from "react-native";
 import { launchImageLibrary } from 'react-native-image-picker';
 import MenubarComponent from "../../components/MenubarComponentAdmin";
 import NavigationPaneAdmin from "../../components/NavigationPaneAdmin";
@@ -57,13 +57,12 @@ const AddProject = () => {
         console.log('Selected asset: ', asset);
   
         const data = new FormData();
-        data.append('file',asset.uri);
+        data.append('file', asset.uri);
         data.append('upload_preset', 'plan_upload'); 
         data.append('cloud_name', 'dipz290mx');
 
         console.log('FormData: ', data);
 
-  
         try {
           const res = await fetch('https://api.cloudinary.com/v1_1/dipz290mx/image/upload', {
             method: 'POST',
@@ -76,7 +75,6 @@ const AddProject = () => {
             console.log('Upload success: ', result);
             setUploadedImageUrl(result.secure_url); // Store the uploaded image URL
           }
-                    
         } catch (error) {
           console.error('Upload failed:: ', error);
         }
@@ -104,98 +102,86 @@ const AddProject = () => {
       .catch((error) => {
         console.error('Error adding document: ', error);
       });
-
-    // Reset the form
-    setProjectTitle('');
-    setTimeline('');  
-    setSubTimelines({
-      excavation: '',
-      foundation: '',
-      structure: '',
-      finishing: '',
-    });
-    setUploadedImageUrl(null);
-    setProjectEstimation('');
-
-    // navigate to project list page
-    router.push('ProjectListPage');
-    
-
-
   }
 
-  const analyzeProject = (imageURL) => {
+  const analyzeProject = () => {
     // Analyze project plan 
+    router.push({
+      pathname: 'ProjectDetailsPage',
+      params: { title: projectTitle }
+    });
   }
 
-  const analyzeEstimation  = (dimention,material) => {
+  const analyzeEstimation  = (dimention, material) => {
     // Analyze project estimation
   }
 
   return (
     <TouchableWithoutFeedback onPress={handleScreenTap}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
       <View style={styles.container}>
         <MenubarComponent onMenuPress={toggleMenu} />
         <Animated.View style={[styles.navigationPane, { transform: [{ translateX: slideAnim }] }]}>
           <NavigationPaneAdmin />
         </Animated.View>
-        <View style={{ marginTop: 50, alignItems: 'flex-start' }}>
-        <TextInput
-            style={styles.title}
-            value={projectTitle}
-            onChangeText={setProjectTitle}
-          />
         
-        </View>
-        <TouchableOpacity  onPress={handleAddPlanPress}>
-        <View style={styles.detailsCard}>
-          {!uploadedImageUrl?(
-            <Text style={styles.planNumber}>No plans found. Upload project plan</Text>
-          ):(
-            <Image source={{ uri: uploadedImageUrl }} style={styles.uploadedImage} />
-          )}
-        </View>
-        </TouchableOpacity>
-        
-        <View style={styles.timelineCard}>
-          <Text style={styles.timeline}>Timeline: <TextInput
-            style={styles.timeline}
-            value={timeline}
-            onChangeText={setTimeline}
-          />
-          </Text> 
-          <Text style={styles.subTimeline}>Excavation: <TextInput
-            style={styles.subTimeline}
-            value={subTimelines.excavation}
-            onChangeText={(text) => setSubTimelines({ ...subTimelines, excavation: text })}
-          /></Text>
-          <Text style={styles.subTimeline}>Foundation: <TextInput
-            style={styles.subTimeline}
-            value={subTimelines.foundation}
-            onChangeText={(text) => setSubTimelines({ ...subTimelines, foundation: text })}
-          /></Text>
-          <Text style={styles.subTimeline}>Structure: <TextInput
-            style={styles.subTimeline}
-            value={subTimelines.structure}
-            onChangeText={(text) => setSubTimelines({ ...subTimelines, structure: text })}
-          /></Text>
-          <Text style={styles.subTimeline}>Finishing: <TextInput
-            style={styles.subTimeline}
-            value={subTimelines.finishing}
-            onChangeText={(text) => setSubTimelines({ ...subTimelines, finishing: text })}
-          /></Text>
-        </View>
-        <TouchableOpacity style={styles.addPlanButton} onPress={handleAddProjectPress}>
-          <Text style={styles.buttonText}>+ Add Project</Text>
-        </TouchableOpacity>
-         <TouchableOpacity style={styles.moreDetailsButton}>
-          <Text style={styles.buttonText}>More Details</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.estimateButton}>
-          <Text style={styles.buttonText}>$ Estimate</Text>
-        </TouchableOpacity>
-        <Text style={styles.footer}>Copyright ©2024 SMARTBUILDER</Text>
+          <View style={{ marginTop: 50, alignItems: 'flex-start' }}>
+            <TextInput
+              style={styles.title}
+              value={projectTitle}
+              onChangeText={setProjectTitle}
+            />
+          </View>
+          <TouchableOpacity onPress={handleAddPlanPress}>
+            <View style={styles.detailsCard}>
+              {!uploadedImageUrl ? (
+                <Text style={styles.planNumber}>No plans found. Upload project plan</Text>
+              ) : (
+                <Image source={{ uri: uploadedImageUrl }} style={styles.uploadedImage} />
+              )}
+            </View>
+          </TouchableOpacity>
+          <View style={styles.timelineCard}>
+            <Text style={styles.timeline}>Timeline: <TextInput
+              style={styles.timeline}
+              value={timeline}
+              onChangeText={setTimeline}
+            />
+            </Text> 
+            <Text style={styles.subTimeline}>Excavation: <TextInput
+              style={styles.subTimeline}
+              value={subTimelines.excavation}
+              onChangeText={(text) => setSubTimelines({ ...subTimelines, excavation: text })}
+            /></Text>
+            <Text style={styles.subTimeline}>Foundation: <TextInput
+              style={styles.subTimeline}
+              value={subTimelines.foundation}
+              onChangeText={(text) => setSubTimelines({ ...subTimelines, foundation: text })}
+            /></Text>
+            <Text style={styles.subTimeline}>Structure: <TextInput
+              style={styles.subTimeline}
+              value={subTimelines.structure}
+              onChangeText={(text) => setSubTimelines({ ...subTimelines, structure: text })}
+            /></Text>
+            <Text style={styles.subTimeline}>Finishing: <TextInput
+              style={styles.subTimeline}
+              value={subTimelines.finishing}
+              onChangeText={(text) => setSubTimelines({ ...subTimelines, finishing: text })}
+            /></Text>
+          </View>
+          <TouchableOpacity style={styles.addPlanButton} onPress={handleAddProjectPress}>
+            <Text style={styles.buttonText}>+ Add Project</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.moreDetailsButton} onPress={analyzeProject}>
+            <Text style={styles.buttonText}>More Details</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.estimateButton}>
+            <Text style={styles.buttonText}>$ Estimate</Text>
+          </TouchableOpacity>
+          <Text style={styles.footer}>Copyright ©2024 SMARTBUILDER</Text>
+      
       </View>
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 };
@@ -205,7 +191,7 @@ const styles = StyleSheet.create({
   header: { fontSize: 24, fontWeight: "bold", color: "#333", textAlign: "center", marginBottom: 10 },
   detailsCard: { backgroundColor: "#E0E0E0", padding: 50, borderRadius: 5, marginBottom: 10 },
   projectTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
-  planNumber: { color: "#757575" , textAlign: "center", marginBottom: 10 },
+  planNumber: { color: "#757575", textAlign: "center", marginBottom: 10 },
   addPlanButton: { backgroundColor: "#00ACC1", padding: 10, borderRadius: 5, marginBottom: 75 },
   timelineCard: { backgroundColor: "#B2EBF2", padding: 10, borderRadius: 5, marginBottom: 10 },
   moreDetailsButton: { backgroundColor: "#66BB6A", padding: 10, borderRadius: 5, marginBottom: 10 },

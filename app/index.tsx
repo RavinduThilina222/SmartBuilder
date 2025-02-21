@@ -21,7 +21,7 @@ import UpdateMaterial from './(pages)/UpdateMaterial';
 import LaborDetail from './(pages)/LaborDetail';
 import ProjectListPage from './(pages)/ProjectListPage';
 import ProjectPage from './(pages)/ProjectPage'; 
-import ProjectDetailsPage from './(pages)/ProjectDetailsPage';
+import ProjectDetailsPage from './(pages)/ProjectDetailsPage'; // Import ProjectDetailsPage
 import EstimatePage from './(pages)/EstimatePage';
 import AddProject from './(pages)/AddProject';
 
@@ -51,7 +51,7 @@ export default function Index() {
         <Stack.Screen name='UpdateMaterial' component={UpdateMaterial} />
         <Stack.Screen name='ProjectListPage' component={ProjectListPage} />
         <Stack.Screen name='ProjectPage' component={ProjectPage} />
-        <Stack.Screen name='ProjectDetailsPage' component={ProjectDetailsPage} />
+        <Stack.Screen name='ProjectDetailsPage' component={ProjectDetailsPage} /> {/* Add ProjectDetailsPage */}
         <Stack.Screen name='EstimatePage' component={EstimatePage} />
         <Stack.Screen name='AddProject' component={AddProject} />
       </Stack.Navigator>

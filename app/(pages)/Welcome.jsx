@@ -1,13 +1,12 @@
 import React from 'react';
 import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
 
 
 const logo = require("../../assets/images/smartbuilder_logo.png");
 
 const Welcome = () => {
-  const navigation = useNavigation();
-
+  
   return (
     <View style={styles.container}>
       <Image source={logo} style={styles.logo} />
@@ -17,7 +16,7 @@ const Welcome = () => {
 
       <TouchableOpacity 
         style={styles.button}
-        onPress={() => navigation.navigate('Login')}>
+        onPress={()=> router.push('Login')}>
         <Text style={styles.buttonText}>Get Started</Text>
       </TouchableOpacity>
       {/* Footer */}
