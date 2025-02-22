@@ -5,6 +5,7 @@ import { db } from '../../firebase.config';
 import { doc, getDoc } from 'firebase/firestore';
 import MenubarComponent from "../../components/MenubarComponentAdmin";
 import NavigationPaneAdmin from "../../components/NavigationPaneAdmin";
+import { router } from "expo-router";
 
 const ProjectPage = () => {
   const route = useRoute();
@@ -59,6 +60,13 @@ const ProjectPage = () => {
     );
   }
 
+  const handleProjectPress = () => {
+    router.push({
+      pathname: 'ProjectDetailsPage',
+      params: { title: projectDetails.title }
+    });
+  };
+
   return (
     <TouchableWithoutFeedback onPress={handleScreenTap}>
       <View style={styles.container}>
@@ -83,7 +91,8 @@ const ProjectPage = () => {
           <Text style={styles.subTimeline}>Structure: {projectDetails.subTimelines.structure}</Text>
           <Text style={styles.subTimeline}>Finishing: {projectDetails.subTimelines.finishing}</Text>
         </View>
-        <TouchableOpacity style={styles.moreDetailsButton}>
+        <TouchableOpacity style={styles.moreDetailsButton}
+        onPress={handleProjectPress}>
           <Text style={styles.buttonText}>More Details</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.estimateButton}>

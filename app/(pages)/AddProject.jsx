@@ -175,9 +175,7 @@ const AddProject = () => {
           <TouchableOpacity style={styles.moreDetailsButton} onPress={analyzeProject}>
             <Text style={styles.buttonText}>More Details</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.estimateButton}>
-            <Text style={styles.buttonText}>$ Estimate</Text>
-          </TouchableOpacity>
+          
           <Text style={styles.footer}>Copyright ©2024 SMARTBUILDER</Text>
       
       </View>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,21 +11,25 @@ import {
   SafeAreaView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons"; // For menu and profile icons
-
-const suppliers = [
-  "Siripathi Hardware",
-  "Nipuna Hardware",
-  "A&D Hardware",
-  "Saman Hardware",
-  "Yalana Hardware",
-  "NewSri Hardware",
-  "Fanzi Hardware",
-  "Badra Hardware",
-];
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase.config"; // Adjust the import path as necessary
 
 const { width, height } = Dimensions.get("window");
 
 const SupplierList = () => {
+  const [suppliers, setSuppliers] = useState([]);
+
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      const suppliersCol = collection(db, "Supplier");
+      const suppliersSnapshot = await getDocs(suppliersCol);
+      const suppliersList = suppliersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setSuppliers(suppliersList);
+    };
+
+    fetchSuppliers();
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground
@@ -58,10 +62,10 @@ const SupplierList = () => {
           <Text style={styles.pageTitle}>Supplier</Text>
           <FlatList
             data={suppliers}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={styles.listItem}>
-                <Text style={styles.supplierName}>{item}</Text>
+                <Text style={styles.supplierName}>{item.supplier_Name}</Text>
                 <TouchableOpacity style={styles.detailsButton}>
                   <Text style={styles.detailsText}>Details</Text>
                 </TouchableOpacity>

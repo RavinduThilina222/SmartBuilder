@@ -1,87 +1,116 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, FlatList } from "react-native";
-import { PieChart } from "react-native-chart-kit";
-import { Dimensions } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import MenubarComponent from "../../components/MenubarComponentAdmin";
+import { useRoute } from "@react-navigation/native";
+import { db } from "../../firebase.config";
+import { collection, getDocs } from "firebase/firestore";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const screenWidth = Dimensions.get("window").width;
+const EstimatePage = () => {
+  const route = useRoute();
+  const { title } = route.params || {}; // Handle case where route.params might be undefined
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [projectDetails, setProjectDetails] = useState(null);
+  const [dimensionDetails, setDimensionDetails] = useState(null);
+  const [materialDetails, setMaterialDetails] = useState([]);
+  const [costEstimates, setCostEstimates] = useState(null);
 
-const data = [
-  { name: "Bricks", population: 300000, color: "#FF6384", legendFontColor: "#7F7F7F", legendFontSize: 12 },
-  { name: "Steel", population: 600000, color: "#36A2EB", legendFontColor: "#7F7F7F", legendFontSize: 12 },
-  { name: "Tiles", population: 450000, color: "#FFCE56", legendFontColor: "#7F7F7F", legendFontSize: 12 },
-  { name: "Wood", population: 100000, color: "#4BC0C0", legendFontColor: "#7F7F7F", legendFontSize: 12 },
-  { name: "Concrete", population: 700000, color: "#9966FF", legendFontColor: "#7F7F7F", legendFontSize: 12 },
-  { name: "Paint", population: 70000, color: "#FF9F40", legendFontColor: "#7F7F7F", legendFontSize: 12 },
-];
+  useEffect(() => {
+    const fetchProjectDetails = async () => {
+      try {
+        const projectQuery = collection(db, 'projects');
+        const projectSnapshot = await getDocs(projectQuery);
+        const projectDoc = projectSnapshot.docs.find(doc => doc.data().title === title);
+        if (projectDoc) {
+          setProjectDetails(projectDoc.data());
+          const dimensionDetails = projectDoc.data().dimensions;
+          setDimensionDetails(dimensionDetails);
+        } else {
+          setError("Project not found");
+        }
+      } catch (err) {
+        setError("Error fetching project details");
+      }
+    };
 
-const materialList = [
-  { material: "Bricks", quantity: "10,000", cost: "300,000" },
-  { material: "Steel", quantity: "2 tons", cost: "600,000" },
-  { material: "Tiles", quantity: "900 sq.ft.", cost: "450,000" },
-  { material: "Wood", quantity: "0.5m3", cost: "100,000" },
-  { material: "Concrete", quantity: "50m3", cost: "700,000" },
-  { material: "Paint", quantity: "50 liters", cost: "70,000" },
-  { material: "Sand", quantity: "10 tons", cost: "50,000" },
-];
+    const fetchMaterialDetails = async () => {
+      try {
+        const materialQuery = collection(db, 'materials');
+        const materialSnapshot = await getDocs(materialQuery);
+        const materials = materialSnapshot.docs.map(doc => doc.data());
+        setMaterialDetails(materials);
+      } catch (err) {
+        setError("Error fetching material details");
+      }
+    };
 
-const EstimatePage  = () => {
+    const fetchData = async () => {
+      await fetchProjectDetails();
+      await fetchMaterialDetails();
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [title]);
+
+  useEffect(() => {
+    const getCostEstimates = async () => {
+      if (dimensionDetails && materialDetails.length > 0) {
+        try {
+          const genAI = new GoogleGenerativeAI("YOUR_API_KEY");
+          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+          const prompt = `Estimate the cost of the project based on the following dimensions and materials:
+          Dimensions: ${JSON.stringify(dimensionDetails)}
+          Materials: ${JSON.stringify(materialDetails)}`;
+
+          const result = await model.generateContent(prompt);
+          setCostEstimates(result.response.text);
+        } catch (err) {
+          setError("Error getting cost estimates");
+        }
+      }
+    };
+
+    getCostEstimates();
+  }, [dimensionDetails, materialDetails]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-    <MenubarComponent /> {/*Added Menubar Component */}
-    <ScrollView style={[styles.container, { marginTop: 60 }]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Report of Estimated Cost</Text>
-        <Text style={styles.projectDetails}>Project name: Project_01</Text>
-        <Text style={styles.projectDetails}>Date: 22/12/2024</Text>
-        <Text style={styles.projectDetails}>Time: 1:54pm</Text>
-      </View>
+      <MenubarComponent />
+      <ScrollView style={[styles.container, { marginTop: 60 }]}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Report of Estimated Cost</Text>
+          <Text style={styles.projectDetails}>Project name: {projectDetails.title}</Text>
+          <Text style={styles.projectDetails}>Date: {new Date().toLocaleDateString()}</Text>
+          <Text style={styles.projectDetails}>Time: {new Date().toLocaleTimeString()}</Text>
+        </View>
 
-      <View style={styles.chartContainer}>
-        <PieChart
-          data={data}
-          width={screenWidth - 40}
-          height={180}
-          chartConfig={{
-            backgroundColor: "#1E2923",
-            backgroundGradientFrom: "#fb8c00",
-            backgroundGradientTo: "#ffa726",
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          }}
-          accessor={"population"}
-          backgroundColor={"transparent"}
-          paddingLeft={"15"}
-          absolute
-        />
-      </View>
+        {costEstimates && (
+          <View style={styles.costEstimates}>
+            <Text>{costEstimates}</Text>
+          </View>
+        )}
 
-      <View style={styles.costContainer}>
-        <Text style={styles.estimatedCost}>2,270,000 LKR</Text>
-        <Text style={styles.costLabel}>Estimated Cost</Text>
-      </View>
-
-      <View style={styles.tableContainer}>
-        <FlatList
-          data={materialList}
-          keyExtractor={(item) => item.material}
-          ListHeaderComponent={() => (
-            <View style={styles.tableRowHeader}>
-              <Text style={[styles.tableCell, styles.tableHeader]}>Materials</Text>
-              <Text style={[styles.tableCell, styles.tableHeader]}>Quantity</Text>
-              <Text style={[styles.tableCell, styles.tableHeader]}>Rupees</Text>
-            </View>
-          )}
-          renderItem={({ item }) => (
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>{item.material}</Text>
-              <Text style={styles.tableCell}>{item.quantity}</Text>
-              <Text style={styles.tableCell}>{item.cost}</Text>
-            </View>
-          )}
-        />
-      </View>
-      <Text style={styles.footer}>Copyright ©2024 SMARTBUILDER</Text>
-    </ScrollView>
+        <Text style={styles.footer}>Copyright ©2024 SMARTBUILDER</Text>
+      </ScrollView>
     </View>
   );
 };
@@ -91,16 +120,9 @@ const styles = StyleSheet.create({
   header: { marginBottom: 20 },
   title: { fontSize: 22, fontWeight: "bold", color: "#333", textAlign: "center" },
   projectDetails: { fontSize: 14, color: "#555", textAlign: "center" },
-  chartContainer: { alignItems: "center", marginVertical: 20 },
-  costContainer: { alignItems: "center", marginBottom: 20 },
-  estimatedCost: { fontSize: 24, fontWeight: "bold", color: "#8E44AD" },
-  costLabel: { fontSize: 16, color: "#555" },
-  tableContainer: { backgroundColor: "#F0F0F0", borderRadius: 10, padding: 10 },
-  tableRowHeader: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: "#CCC", paddingBottom: 5, marginBottom: 5 },
-  tableRow: { flexDirection: "row", paddingVertical: 5 },
-  tableCell: { flex: 1, textAlign: "center", color: "#333" },
-  tableHeader: { fontWeight: "bold", color: "#444" },
+  costEstimates: { marginTop: 20 },
   footer: { textAlign: "center", color: "#888", marginTop: 20, fontSize: 12 },
+  errorText: { color: "red", textAlign: "center", marginTop: 20 },
 });
 
 export default EstimatePage;

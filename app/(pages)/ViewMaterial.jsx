@@ -49,7 +49,7 @@ export default function ViewMaterials() {
     closeMenu();
   };
 
-  const filteredMaterials = selectedType === 'All' ? materialsData : materialsData.filter(material => material.type === selectedType);
+  const filteredMaterials = selectedType === 'All' ? materialsData : materialsData.filter(material => material.Type === selectedType);
 
   return (
     <TouchableWithoutFeedback onPress={handleScreenTap}>
@@ -75,7 +75,12 @@ export default function ViewMaterials() {
               >
                 <Picker.Item label="All" value="All" />
                 <Picker.Item label="Cement" value="Cement" />
-                <Picker.Item label="Steel" value="Steel" />
+                <Picker.Item label="Steel" value="steel" />
+                <Picker.Item label="Sand" value="Sand" />
+                <Picker.Item label="Bricks" value="Bricks" />
+                <Picker.Item label="Lime" value="Lime" />
+                <Picker.Item label="Roofings" value="Roofings" />
+                <Picker.Item label="Metal" value="Metal" />
               </Picker>
 
               <FlatList
@@ -83,8 +88,8 @@ export default function ViewMaterials() {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <View style={styles.card}>
-                    <Text style={styles.cardTitle}>{item.name}</Text>
-                    <Text style={styles.cardPrice}>Rs {item.price}.00</Text>
+                    <Text style={styles.cardTitle}>{item.Name}</Text>
+                    <Text style={styles.cardPrice}>Rs {item.Price}.00</Text>
                   </View>
                 )}
               />

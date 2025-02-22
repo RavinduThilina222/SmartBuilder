@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, Text, TextInput, View, Button, StyleSheet, Picker, Animated, TouchableWithoutFeedback, Image, ActivityIndicator } from 'react-native';
+import { ScrollView, Text, View, Button, TouchableOpacity,StyleSheet, Animated, TouchableWithoutFeedback, Image, ActivityIndicator } from 'react-native';
 import MenubarComponent from "../../components/MenubarComponentAdmin";
 import NavigationPaneAdmin from "../../components/NavigationPaneAdmin";
 import { db } from "../../firebase.config";
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useRoute } from '@react-navigation/native';
+import { router } from 'expo-router';
 
 
 export default function ProjectDetailsPage() {
@@ -16,6 +17,7 @@ export default function ProjectDetailsPage() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [projectDetails, setProjectDetails] = useState(null);
+  const [projectId, setProjectId] = useState(null); // Store the document ID
   const [analysisResult, setAnalysisResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,8 +30,10 @@ export default function ProjectDetailsPage() {
           const q = query(collection(db, 'projects'), where('title', '==', title));
           const querySnapshot = await getDocs(q);
           if (!querySnapshot.empty) {
-            const projectData = querySnapshot.docs[0].data();
+            const projectDoc = querySnapshot.docs[0];
+            const projectData = projectDoc.data();
             setProjectDetails(projectData);
+            setProjectId(projectDoc.id); // Store the document ID
             analyzeImage(projectData.planURL);
           } else {
             console.log("No such document!");
@@ -52,11 +56,18 @@ export default function ProjectDetailsPage() {
 
   const analyzeImage = async (imageUrl) => {
     const genAI = new GoogleGenerativeAI("AIzaSyBxqhO8Gn5bveeXoO8IzTC6_REFldxQ1eI");
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
   
     Image.getSize(imageUrl, (width, height) => {
-      const prompt = `Analyze the dimensions of the project plan image: ${imageUrl}. The dimensions are ${width}x${height} pixels. Please provide detailed analysis of the dimensions for different rooms such as the kitchen, living room, bedrooms, and bathrooms.`;
-  
+      const prompt = `Analyze the dimensions of the project plan image: ${imageUrl}. The dimensions are ${width}x${height} feet and inches. Please provide detailed analysis of the dimensions for the all different rooms such as the kitchen, living room, bedrooms, and bathrooms in JSON format.
+      And also set avarage value for each dimention.
+      No need to describe the image, just provide the analysis of the  dimension values in JSON format.
+      don't need multiple values for the same dimention, just provide the avarage value for each dimention.
+      for the wall thickness(not need depth),trench,columns dimentions  assigned the assumed dimension values like height, width, depth for each dimention.
+      Also include the roof details(use asbestos sheet) and area of the roof in the analysis.
+      include the floor details and area of the floor in the analysis.`;
+
+    
       model.generateContent(prompt)
         .then(result => {
           setAnalysisResult(result.response.text());
@@ -95,6 +106,48 @@ export default function ProjectDetailsPage() {
     closeMenu();
   };
 
+  const saveDimensions = async () => {
+    if (projectDetails && analysisResult && projectId) {
+      try {
+        console.log('Project ID:', projectId); // Add logging
+        const projectRef = doc(db, 'projects', projectId); // Use the stored document ID
+        const projectDoc = await getDoc(projectRef);
+        if (projectDoc.exists()) {
+          await updateDoc(projectRef, {
+            dimensions: analysisResult
+          });
+          alert('Dimensions saved successfully!');
+        } else {
+          console.error('No document to update:', projectId);
+          alert('No document to update');
+        }
+      } catch (error) {
+        console.error('Error saving dimensions:', error);
+        alert('Error saving dimensions');
+      }
+    } else {
+      alert('No dimensions to save');
+    }
+  };
+
+  const renderTable = (data) => (
+    <View style={styles.table}>
+      {Object.entries(data).map(([key, value]) => (
+        <View key={key} style={styles.tableRow}>
+          <Text style={styles.tableCell}>{key}</Text>
+          <Text style={styles.tableCell}>{JSON.stringify(value)}</Text>
+        </View>
+      ))}
+    </View>
+  );
+
+  const handleEstimationPress = () => {
+      router.push({
+        pathname: 'EstimatePage',
+        params: { title: projectDetails.title }
+      });
+    };
+
   return (
     <TouchableWithoutFeedback onPress={handleScreenTap}>
       <View style={styles.container}>
@@ -112,29 +165,22 @@ export default function ProjectDetailsPage() {
               <Text style={styles.sectionHeader}>{projectDetails.title}</Text>
               <Image source={{ uri: projectDetails.planURL }} style={styles.uploadedImage} />
               <Text style={styles.subHeader}>Construction Specification</Text>
-              <View style={styles.inputGroup}>
-                <Text>Type of Foundation</Text>
-                <Picker style={styles.picker}>
-                  <Picker.Item label="Option 1" value="" />
-                  <Picker.Item label="Option 2" value="" />
-                </Picker>
-                <Text>Number of Floors</Text>
-                <Picker style={styles.picker}>
-                  <Picker.Item label="1" value="1" />
-                  <Picker.Item label="2" value="2" />
-                </Picker>
-                <Text>Roofing Specification</Text>
-                <Picker style={styles.picker}>
-                  <Picker.Item label="Option A" value="" />
-                  <Picker.Item label="Option B" value="" />
-                </Picker>
-              </View>
-
+              
               {/* Display analysis result */}
               {analysisResult && (
                 <View style={styles.analysisResult}>
                   <Text style={styles.subHeader}>Analysis Result</Text>
-                  <Text>{analysisResult}</Text>
+                  {typeof analysisResult === 'object' ? (
+                    <>
+                      {renderTable(analysisResult.project_plan_dimensions)}
+                      {renderTable(analysisResult.room_dimensions)}
+                      {renderTable(analysisResult.structural_elements)}
+                      {renderTable(analysisResult.roof)}
+                      {renderTable(analysisResult.floor)}
+                    </>
+                  ) : (
+                    <Text>{analysisResult}</Text>
+                  )}
                 </View>
               )}
             </>
@@ -143,8 +189,12 @@ export default function ProjectDetailsPage() {
           )}
         </ScrollView>
         <View style={styles.buttonContainer}>
-          <Button title="Save" onPress={() => alert('Saved!')} />
+          <Button title="Save" onPress={saveDimensions} />
         </View>
+        <TouchableOpacity style={styles.estimateButton}
+          onPress={handleEstimationPress}>
+          <Text style={styles.buttonText}>$ Estimate</Text>
+        </TouchableOpacity>
         <Text style={styles.footer}>Copyright ©2024 SMARTBUILDER</Text>
       </View>
     </TouchableWithoutFeedback>
@@ -224,6 +274,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 5,
   },
+  estimateButton: { backgroundColor: "#3b28c9", padding: 10, borderRadius: 5 },
+  buttonText: { color: "#fff", textAlign: "center", fontWeight: "bold" },
   analysisResult: {
     marginTop: 20,
     padding: 10,
@@ -234,5 +286,17 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     marginTop: 20,
+  },
+  table: {
+    marginTop: 10,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 5,
+  },
+  tableCell: {
+    flex: 1,
+    textAlign: 'left',
   },
 });
