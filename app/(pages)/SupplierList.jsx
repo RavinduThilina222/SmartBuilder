@@ -13,11 +13,13 @@ import {
 import Icon from "react-native-vector-icons/MaterialIcons"; // For menu and profile icons
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase.config"; // Adjust the import path as necessary
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
 const SupplierList = () => {
   const [suppliers, setSuppliers] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -29,6 +31,10 @@ const SupplierList = () => {
 
     fetchSuppliers();
   }, []);
+
+  const handleDetailsPress = (supplier) => {
+    navigation.navigate("SupplierDetails", { supplier });
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -65,8 +71,11 @@ const SupplierList = () => {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={styles.listItem}>
-                <Text style={styles.supplierName}>{item.supplier_Name}</Text>
-                <TouchableOpacity style={styles.detailsButton}>
+                <View>
+                  <Text style={styles.supplierName}>{item.Supplier_Name}</Text>
+                  <Text style={styles.supplierCity}>{item.City}</Text>
+                </View>
+                <TouchableOpacity style={styles.detailsButton} onPress={() => handleDetailsPress(item)}>
                   <Text style={styles.detailsText}>Details</Text>
                 </TouchableOpacity>
               </View>
@@ -140,6 +149,10 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  supplierCity: {
+    color: "white",
+    fontSize: 14,
   },
   detailsButton: {
     backgroundColor: "white",

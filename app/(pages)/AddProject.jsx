@@ -11,16 +11,15 @@ const AddProject = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
   const slideAnim = useState(new Animated.Value(-250))[0]; // Initial position of the navigation pane
-  const [timeline, setTimeline] = useState("2024/08/01 - 2025/01/25");
+  const [timeline, setTimeline] = useState("2025/02/01 - 2025/07/25");
   const [subTimelines, setSubTimelines] = useState({
-    excavation: "2024/08/01 - 2024/08/01",
-    foundation: "2024/08/08 - 2024/08/10",
-    structure: "2024/11/15 - 2024/11/17",
-    finishing: "2025/01/20 - 2025/01/25"
+    excavation: "2025/02/01 - 2025/03/01",
+    foundation: "2025/03/02 - 2025/04/10",
+    structure: "2025/04/15 - 2025/06/19",
+    finishing: "2025/06/20 - 2025/07/25"
   });
   const [projectTitle, setProjectTitle] = useState("Project Title");
-  const [projectEstimation, setProjectEstimation] = useState("");
-  const [dimention, setDimention] = useState("");
+  
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -90,9 +89,7 @@ const AddProject = () => {
       title: projectTitle,
       timeline: timeline,
       subTimelines: subTimelines,
-      planURL: uploadedImageUrl,
-      estimation: projectEstimation,
-      dimention: dimention,
+      planURL: uploadedImageUrl
     };
 
     addDoc(collection(db, 'projects'), projectData)

@@ -7,7 +7,8 @@ const NavigationPaneAdmin = () => {
   return (
     <View style={styles.container}>
       {/* Home */}
-      <TouchableOpacity style={styles.navItem}>
+      <TouchableOpacity style={styles.navItem}
+      onPress={() => router.navigate("ProjectListPage")}>
         <Ionicons name="home" size={24} color="#fff" style={styles.icon} />
         <Text style={styles.text}>Home</Text>
       </TouchableOpacity>
@@ -20,12 +21,13 @@ const NavigationPaneAdmin = () => {
       </TouchableOpacity>
 
       {/* Suppliers */}
-      <TouchableOpacity style={styles.navItem}>
+      <TouchableOpacity style={styles.navItem}
+      onPress={() => router.navigate("SupplierList")}>
         <FontAwesome5 name="users" size={24} color="#fff" style={styles.icon} />
         <Text style={styles.text}>Suppliers</Text>
       </TouchableOpacity>
 
-      {/* Suppliers */}
+      {/* Labors */}
       <TouchableOpacity style={styles.navItem}
       onPress={() => router.navigate("LabourList")}>
         <FontAwesome5 name="build" size={24} color="#fff" style={styles.icon} />

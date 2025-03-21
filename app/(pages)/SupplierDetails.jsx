@@ -9,8 +9,12 @@ import {
   ImageBackground,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
 
-export default function SupplierPage() {
+export default function SupplierDetails() {
+  const route = useRoute();
+  const { supplier } = route.params;
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -39,19 +43,18 @@ export default function SupplierPage() {
 
         {/* Page Title */}
         <View style={styles.pageTitleContainer}>
-          <Text style={styles.pageTitle}>Supplier</Text>
+          <Text style={styles.pageTitle}>Supplier Details</Text>
         </View>
 
         {/* Content */}
         <ScrollView contentContainerStyle={styles.contentContainer}>
           {/* Supplier Info Card */}
           <View style={styles.supplierCard}>
-            <Text style={styles.supplierName}>Siripathi Hardware</Text>
-            <Text style={styles.reviews}>
-              ★★★★★ <Text>(20 reviews)</Text>
-            </Text>
-            <Text style={styles.address}>No 72/A, Horana Road, Panadura</Text>
-            <Text style={styles.phone}>+94 77 123 4567</Text>
+            <Text style={styles.supplierName}>{supplier.Supplier_Name}</Text>
+            <Text style={styles.address}>{supplier.City}</Text>
+            <Text style={styles.address}>{supplier.Address}</Text>
+            <Text style={styles.address}>{supplier.Phone_No}</Text>
+            {/* Add more supplier details here if needed */}
           </View>
 
           {/* Material Table */}
@@ -62,24 +65,7 @@ export default function SupplierPage() {
               <Text style={styles.tableHeaderText}>Brand</Text>
               <Text style={styles.tableHeaderText}>Price</Text>
             </View>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>Cement</Text>
-              <Text style={styles.tableCell}>50Kg</Text>
-              <Text style={styles.tableCell}>Tokyo Super</Text>
-              <Text style={styles.tableCell}>2000.00</Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>Steel QT Bars</Text>
-              <Text style={styles.tableCell}>32mm</Text>
-              <Text style={styles.tableCell}>Lanwa</Text>
-              <Text style={styles.tableCell}>760.00</Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>TileMortar</Text>
-              <Text style={styles.tableCell}>25Kg</Text>
-              <Text style={styles.tableCell}>Swisstek Ultra Grip</Text>
-              <Text style={styles.tableCell}>2900.00</Text>
-            </View>
+            {/* Render materials here if available */}
           </View>
         </ScrollView>
 
@@ -153,19 +139,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#007B6A",
   },
-  reviews: {
-    fontSize: 14,
-    color: "#FFD700",
-    marginVertical: 4,
-  },
   address: {
     fontSize: 14,
     color: "#333333",
-  },
-  phone: {
-    fontSize: 14,
-    color: "#007B6A",
-    marginTop: 4,
   },
   tableContainer: {
     backgroundColor: "rgba(255, 255, 255, 0.9)",
@@ -187,17 +163,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     color: "#007B6A",
-    flex: 1,
-    textAlign: "center",
-  },
-  tableRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 8,
-  },
-  tableCell: {
-    fontSize: 14,
-    color: "#333333",
     flex: 1,
     textAlign: "center",
   },
